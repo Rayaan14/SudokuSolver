@@ -1,3 +1,26 @@
+""" GUI based Sudoku Solver
+
+This script allows the user to solve a pre-defined square sudoku board.
+The algorithm makes use of backtracking and recursion to quickly solve
+the toughest of boards within seconds!
+
+This file does not accept any input. The board has been pre-defined and,
+as such, any square sudoku grid may be used instead formatted as a 2D-array.
+The empty slots should be replaced with zeroes (0).
+
+This script does not require any additional modules or libraries to be installed.
+
+The following functions are present in this script. Documentation
+can be found as docstrings in the respective functions.
+
+    * printBoard - prints sudoku board to the console in a human-readable manner
+    * findEmpty - finds an empty slot in the sudoku grid
+    * isPossible - determines the validity of adding a number to a specific slot
+    * solve - solves the board using backtracking
+"""
+
+# pre-defined square sudoku board as a 2D-array
+# the zeroes denote empty slots to be filled
 board = [
     [7, 8, 0, 4, 0, 0, 1, 2, 0],
     [6, 0, 0, 0, 7, 5, 0, 0, 9],
@@ -12,28 +35,56 @@ board = [
 
 
 def printBoard(board):
+    """ Prints the sudoku board to the console in a human-readable format
+
+        Parameters
+        ----------
+        board : 2D-array
+            Pre-defined square sudoku board
+
+        Returns
+        -------
+        None
+    """
 
     print()
 
+    # print horizontal line every three rows
     for i in range(len(board)):
         if i % 3 == 0 and i != 0:
             print("-----------------------")
 
+        # print vertical line every third column
         for j in range(len(board[0])):
             if j % 3 == 0 and j != 0:
                 print(" | ", end="")
 
             if j == 8:
-                print(board[i][j])
+                print(board[i][j]) # move onto new line after each row
             else:
-                print(str(board[i][j]) + " ", end="")
+                print(str(board[i][j]) + " ", end="") # stay on same line within the row
 
 
 def findEmpty(board):
+    """ Finds the next empty slot in the sudoku grid
+
+            Empty slots in the grid are denoted by 0. The function first checks for an
+            empty slot column-wise starting from the top and then moves on to subsequent rows.
+
+            Parameters
+            ----------
+            board : 2D-array
+                Pre-defined square sudoku board
+
+            Returns
+            -------
+            position : tuple
+                Position of the empty slot in the form (row, column)
+            """
 
     for i in range(len(board)):
         for j in range(len(board[0])):
-            if board[i][j] == 0:
+            if board[i][j] == 0: # empty slots are marked with zeroes
                 return i, j
 
 def isPossible(board, entry, pos):
