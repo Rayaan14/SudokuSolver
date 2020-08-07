@@ -1,26 +1,5 @@
-""" GUI based Sudoku Solver
-
-This script allows the user to solve a pre-defined square sudoku board.
-The algorithm makes use of backtracking and recursion to quickly solve
-the toughest of boards within seconds!
-
-This file does not accept any input. The board has been pre-defined and,
-as such, any square sudoku grid may be used instead formatted as a 2D-array.
-The empty slots should be replaced with zeroes (0).
-
-This script does not require any additional modules or libraries to be installed.
-
-The following functions are present in this script. Documentation
-can be found as docstrings in the respective functions.
-
-    * printBoard - prints sudoku board to the console in a human-readable manner
-    * findEmpty - finds an empty slot in the sudoku grid
-    * isPossible - determines the validity of adding a number to a specific slot
-    * solve - solves the board using backtracking
-"""
-
 # pre-defined square sudoku board as a 2D-array
-# the zeroes denote empty slots to be filled
+# the zeroes denote empty slots to be filled in
 board = [
     [7, 8, 0, 4, 0, 0, 1, 2, 0],
     [6, 0, 0, 0, 7, 5, 0, 0, 9],
@@ -79,7 +58,7 @@ def findEmpty(board):
             Returns
             -------
             position : tuple
-                Position of the empty slot in the form (row, column)
+                Position of an empty slot of the form (row, column)
             """
 
     for i in range(len(board)):
@@ -88,17 +67,38 @@ def findEmpty(board):
                 return i, j
 
 def isPossible(board, entry, pos):
+    """ Determines the validity of adding a number to a specific slot in the sudoku board
 
+            Parameters
+            ----------
+            board : 2D-array
+                Pre-defined square sudoku board
+            entry : Integer
+                1 <= entry <= 9
+            pos : tuple
+                Position of a slot in the board of the form (row, column)
+
+            Returns
+            -------
+            isValid : boolean
+                * True if adding entry to pos results in a valid board
+                * False otherwise
+            """
+
+    # checks whether entry is present in the same row as pos
     for j in range(len(board[0])):
-        if board[pos[0]][j] == entry and pos[1] != j:
+        if board[pos[0]][j] == entry and pos[1] != j: # we exclude pos itself
             return False
 
+    # checks whether entry is present in the same column as pos
     for i in range(len(board)):
         if board[i][pos[1]] == entry and pos[0] != i:
             return False
 
+    # determines top left position of 3 x 3 square grid pos is within
     boxPos = ((pos[0] // 3) * 3, (pos[1] // 3) * 3)
 
+    # checks whether entry is present in the same 3 x 3 grid as pos
     for i in range(boxPos[0], boxPos[0] + 3):
         for j in range(boxPos[1], boxPos[1] + 3):
             if board[i][j] == entry and pos != (i, j):
@@ -107,30 +107,49 @@ def isPossible(board, entry, pos):
     return True
 
 def solve(board):
+    """ Solves the board using backtracking
 
-    empty = findEmpty(board)
+            Parameters
+            ----------
+            board : 2D-array
+                Pre-defined square sudoku board
 
-    if not empty:
+            Returns
+            -------
+            None
+        """
+
+    empty = findEmpty(board) # find the next empty slot
+
+    if not empty: # if the board is not empty, it is full and we are done
         return True
     else:
         row, col = empty
 
-    for i in range(1, 10):
+    for i in range(1, 10): # possible entries
         if isPossible(board, i, (row, col)):
-            board[row][col] = i
+            board[row][col] = i # set the empty slot to entry
 
-            if solve(board):
+            if solve(board): # recurse to solve the rest of the board
                 return True
 
-            board[row][col] = 0
+            board[row][col] = 0 # backtrack if no valid entries
 
-    return False
+    return False # if no valid entries
 
-
+# uncomment the calls below and run this script to check the solved and unsolved boards in the console!
+"""
+print()
+print('Initial Board.', end='')
 printBoard(board)
 solve(board)
 print()
+print('SOLVED!', end='')
 printBoard(board)
+"""
+
+
+
 
 
 
