@@ -7,7 +7,7 @@ This script allows the user to solve a simple square sudoku board.
 The algorithm makes use of backtracking and recursion to quickly solve
 the toughest of boards within seconds!
 
-#For the text-based version (solver.py) ...
+# For the text-based version (solver.py) ...
 This file does not accept any input. The board has been pre-defined and,
 as such, any square sudoku grid may be used instead formatted as a 2D-array.
 The empty slots should be replaced with zeroes (0).
