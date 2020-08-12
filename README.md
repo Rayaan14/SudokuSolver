@@ -1,7 +1,7 @@
 # Sudoku Solver
 This is a sudoku solver utilizing the backtracking algorithm. It includes a graphical GUI as well as a text based version.
 
-Run GUI.py to play sudoku! (Work in Progress)
+Run main.py to play sudoku! (Work in Progress)
 
 This script allows the user to solve a simple square sudoku board.
 The algorithm makes use of backtracking and recursion to quickly solve
