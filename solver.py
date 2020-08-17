@@ -1,6 +1,6 @@
 # pre-defined square sudoku board as a 2D-array
 # the zeroes denote empty slots to be filled in
-board = [
+brd = [
     [7, 8, 0, 4, 0, 0, 1, 2, 0],
     [6, 0, 0, 0, 7, 5, 0, 0, 9],
     [0, 0, 0, 6, 0, 1, 0, 7, 8],
@@ -141,12 +141,14 @@ def solve(board):
 """
 print()
 print('Initial Board.', end='')
-printBoard(board)
-solve(board)
+printBoard(brd)
+solve(brd)
 print()
 print('SOLVED!', end='')
-printBoard(board)
+printBoard(brd)
 """
+
+
 
 
 

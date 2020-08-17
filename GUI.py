@@ -1,23 +1,35 @@
-import pygame, sys
-from settings import *
+##############################################################
+import sys
+import pygame
+import requests
+from solver import *
 from buttons import *
+from settings import *
+from bs4 import BeautifulSoup
+##############################################################
+
 
 class App:
+##############################################################
     def __init__(self):
         pygame.init()
         self.window = pygame.display.set_mode((WIDTH, HEIGHT))
         self.running = True
-        self.grid = testBoard2
         self.selected = None
         self.mousePos = None
         self.state = "Playing"
+        self.finished = False
+        self.cellChanged = False
         self.font = pygame.font.SysFont(font, cellSize // 2)
         self.playingButtons = []
-        self.menuButtons = []
-        self.endButtons = []
         self.lockedCells = []
+        self.incorrectCells = []
+        self.grid = []
+        self.getPuzzle("1")
         self.load()
+##############################################################
 
+##############################################################
     def run(self):
         while self.running:
             if self.state == "Playing":
@@ -26,29 +38,44 @@ class App:
                 self.playingDraw()
         pygame.quit()
         sys.exit()
+##############################################################
 
-########## PLAYING STATE FUNCTIONS ##########
+############### PLAYING STATE FUNCTIONS ######################
 
     def playingEvents(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 selected = self.mouseOnGrid()
                 if selected:
                     self.selected = selected
                 else:
                     self.selected = None
+                    for button in self.playingButtons:
+                        if button.highlighted:
+                            button.click()
+
             if event.type == pygame.KEYDOWN:
                 if self.selected is not None and list(self.selected) not in self.lockedCells:
                     if self.isInt(event.unicode):
+                        # Cell changed
                         self.grid[self.selected[1]][self.selected[0]] = int(event.unicode)
+                        self.cellChanged = True
 
     def playingUpdate(self):
         self.mousePos = pygame.mouse.get_pos()
 
         for button in self.playingButtons:
             button.update(self.mousePos)
+
+        if self.cellChanged:
+            self.incorrectCells = []
+            self.checkAllCells()
+            if self.allCellsDone():
+                if len(self.incorrectCells) == 0:
+                    self.finished = True
 
     def playingDraw(self):
         self.window.fill(WHITE)
@@ -60,13 +87,40 @@ class App:
             self.drawSelection(self.window, self.selected)
 
         self.shadeLockedCells(self.window, self.lockedCells)
+        self.shadeIncorrectCells(self.window, self.incorrectCells)
 
         self.drawNumbers(self.window)
 
         self.drawGrid(self.window)
         pygame.display.update()
+        self.cellChanged = False # Reset
+##############################################################
 
-########## HELPER FUNCTIONS ##########
+############### HELPER FUNCTIONS ##########################
+
+    def getPuzzle(self, diff):
+        htmlDoc = requests.get("https://grid.websudoku.com/?level={}".format(diff)).content
+        soup = BeautifulSoup(htmlDoc, features='html.parser')
+        ids = ['f00', 'f01', 'f02', 'f03', 'f04', 'f05', 'f06', 'f07', 'f08', 'f10', 'f11', 'f12', 'f13', 'f14', 'f15',
+               'f16', 'f17', 'f18', 'f20', 'f21', 'f22', 'f23', 'f24', 'f25', 'f26', 'f27', 'f28', 'f30', 'f31', 'f32',
+               'f33', 'f34', 'f35', 'f36', 'f37', 'f38', 'f40', 'f41', 'f42', 'f43', 'f44', 'f45', 'f46', 'f47', 'f48',
+               'f50', 'f51', 'f52', 'f53', 'f54', 'f55', 'f56', 'f57', 'f58', 'f60', 'f61', 'f62', 'f63', 'f64', 'f65',
+               'f66', 'f67', 'f68', 'f70', 'f71', 'f72', 'f73', 'f74', 'f75', 'f76', 'f77', 'f78', 'f80', 'f81', 'f82',
+               'f83', 'f84', 'f85', 'f86', 'f87', 'f88']
+        data = []
+        for cid in ids:
+            data.append(soup.find('input', id=cid))
+
+        board = [[0 for x in range(9)] for x in range(9)]
+
+        for ind, dat in enumerate(data):
+            try:
+                board[ind // 9][ind % 9] = int(dat['value'])
+            except:
+                pass
+
+        self.grid = board
+        self.load()
 
     def drawNumbers(self, window):
         for y, row in enumerate(self.grid):
@@ -93,7 +147,12 @@ class App:
         return (self.mousePos[0] - gridPos[0]) // cellSize, (self.mousePos[1] - gridPos[1]) // cellSize
 
     def loadButtons(self):
-        self.playingButtons.append(Button(20, 40, 100, 40))
+        self.playingButtons.append(Button(20, 40, WIDTH//7, 40, function=solve, color=LIGHTGREEN, parameters=self.grid, text="SOLVE"))
+        self.playingButtons.append(Button(140, 40, WIDTH//7, 40, function=self.getPuzzle, color=LIGHTGREEN, parameters="1", text="Easy"))
+        self.playingButtons.append(Button(WIDTH//2-(WIDTH//7)//2, 40, WIDTH//7, 40, function=self.getPuzzle, color=LIGHTGREEN, parameters="2", text="Medium"))
+        self.playingButtons.append(Button(380, 40, WIDTH//7, 40, function=self.getPuzzle, color=LIGHTGREEN, parameters="3", text="Hard"))
+        self.playingButtons.append(Button(500, 40, WIDTH // 7, 40, function=self.getPuzzle, color=LIGHTGREEN, parameters="4", text="Expert"))
+
 
     def textToScreen(self, window, text, pos, color=BLACK):
         font = self.font.render(text, False, color)
@@ -104,7 +163,11 @@ class App:
         window.blit(font, pos)
 
     def load(self):
+        self.playingButtons = []
         self.loadButtons()
+        self.lockedCells = []
+        self.incorrectCells = []
+        self.finished = False
 
         # Setting locked cells
         for y, row in enumerate(self.grid):
@@ -116,12 +179,32 @@ class App:
         for cell in locked:
             pygame.draw.rect(window, CORNSILK, (cell[0] * cellSize + gridPos[0], cell[1] * cellSize + gridPos[1], cellSize, cellSize))
 
+    def shadeIncorrectCells(self, window, incorrect):
+        for cell in incorrect:
+            pygame.draw.rect(window, LIGHTRED, (cell[0] * cellSize + gridPos[0], cell[1] * cellSize + gridPos[1], cellSize, cellSize))
+
     def isInt(self, str):
         try:
             int(str)
             return True
         except:
             return False
+
+    def allCellsDone(self):
+        for row in self.grid:
+            for num in row:
+                if num == 0:
+                    return False
+        return True
+
+    def checkAllCells(self):
+        _ = [self.incorrectCells.append([x, y]) for y, row in enumerate(self.grid) for x, num in enumerate(row) if not isPossible(self.grid, num, (y, x)) if num != 0]
+        return all([isPossible(self.grid, num, (y, x)) for y, row in enumerate(self.grid) for x, num in enumerate(row)])
+
+##############################################################
+
+
+
 
 
 
