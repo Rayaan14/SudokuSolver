@@ -8,10 +8,17 @@ BLACK = (0, 0, 0)
 LIGHTORANGE = (250, 171, 83)
 CORNSILK = (255, 248, 220)
 LIGHTRED = (230, 80, 80)
-LIGHTGREEN = (52, 179, 16)
+SOLVE = (52, 179, 16)
+EASY = (205, 85, 235)
+MEDIUM = (85, 235, 235)
+HARD = (245, 240, 55)
+EXPERT = (225, 50, 25)
+
+
 
 # Fonts
-font = 'lato'
+numFont = 'lato'
+txtFont = 'arial'
 
 # Boards
 testBoard1 = [[0 for x in range(9)] for x in range(9)]
@@ -35,7 +42,8 @@ finishedBoard = [
          [8, 5, 1, 7, 9, 2, 6, 4, 3],
          [1, 3, 8, 9, 4, 7, 2, 5, 6],
          [6, 9, 2, 3, 5, 1, 8, 7, 4],
-         [7, 4, 5, 2, 8, 6, 3, 1, 9]]
+         [7, 4, 5, 2, 8, 6, 3, 1, 9]
+]
 
 # Positions and Sizes
 gridPos = (75, 100)

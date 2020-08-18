@@ -17,10 +17,9 @@ class App:
         self.running = True
         self.selected = None
         self.mousePos = None
-        self.state = "Playing"
         self.finished = False
         self.cellChanged = False
-        self.font = pygame.font.SysFont(font, cellSize // 2)
+        self.font = pygame.font.SysFont(numFont, cellSize // 2)
         self.playingButtons = []
         self.lockedCells = []
         self.incorrectCells = []
@@ -32,10 +31,9 @@ class App:
 ##############################################################
     def run(self):
         while self.running:
-            if self.state == "Playing":
-                self.playingEvents()
-                self.playingUpdate()
-                self.playingDraw()
+            self.playingEvents()
+            self.playingUpdate()
+            self.playingDraw()
         pygame.quit()
         sys.exit()
 ##############################################################
@@ -96,7 +94,7 @@ class App:
         self.cellChanged = False # Reset
 ##############################################################
 
-############### HELPER FUNCTIONS ##########################
+################## HELPER FUNCTIONS ##########################
 
     def getPuzzle(self, diff):
         htmlDoc = requests.get("https://grid.websudoku.com/?level={}".format(diff)).content
@@ -122,12 +120,12 @@ class App:
         self.grid = board
         self.load()
 
-    def drawNumbers(self, window):
+    def drawNumbers(self, window, color=BLACK):
         for y, row in enumerate(self.grid):
             for x, num in enumerate(row):
                 if num != 0:
                     pos = [x * cellSize + gridPos[0], y * cellSize + gridPos[1]]
-                    self.textToScreen(window, str(num), pos)
+                    self.textToScreen(window, str(num), pos, color)
 
     def drawSelection(self, window, pos):
         pygame.draw.rect(window, LIGHTORANGE, ((pos[0] * cellSize) + gridPos[0], (pos[1] * cellSize) + gridPos[1], cellSize, cellSize))
@@ -147,12 +145,11 @@ class App:
         return (self.mousePos[0] - gridPos[0]) // cellSize, (self.mousePos[1] - gridPos[1]) // cellSize
 
     def loadButtons(self):
-        self.playingButtons.append(Button(20, 40, WIDTH//7, 40, function=solve, color=LIGHTGREEN, parameters=self.grid, text="SOLVE"))
-        self.playingButtons.append(Button(140, 40, WIDTH//7, 40, function=self.getPuzzle, color=LIGHTGREEN, parameters="1", text="Easy"))
-        self.playingButtons.append(Button(WIDTH//2-(WIDTH//7)//2, 40, WIDTH//7, 40, function=self.getPuzzle, color=LIGHTGREEN, parameters="2", text="Medium"))
-        self.playingButtons.append(Button(380, 40, WIDTH//7, 40, function=self.getPuzzle, color=LIGHTGREEN, parameters="3", text="Hard"))
-        self.playingButtons.append(Button(500, 40, WIDTH // 7, 40, function=self.getPuzzle, color=LIGHTGREEN, parameters="4", text="Expert"))
-
+        self.playingButtons.append(Button(20, 40, WIDTH//7, 40, function=solve, color=SOLVE, parameters=self.grid, text="SOLVE"))
+        self.playingButtons.append(Button(140, 40, WIDTH//7, 40, function=self.getPuzzle, color=EASY, parameters="1", text="Easy"))
+        self.playingButtons.append(Button(WIDTH//2-(WIDTH//7)//2, 40, WIDTH//7, 40, function=self.getPuzzle, color=MEDIUM, parameters="2", text="Medium"))
+        self.playingButtons.append(Button(380, 40, WIDTH//7, 40, function=self.getPuzzle, color=HARD, parameters="3", text="Hard"))
+        self.playingButtons.append(Button(500, 40, WIDTH // 7, 40, function=self.getPuzzle, color=EXPERT, parameters="4", text="Expert"))
 
     def textToScreen(self, window, text, pos, color=BLACK):
         font = self.font.render(text, False, color)
@@ -202,13 +199,4 @@ class App:
         return all([isPossible(self.grid, num, (y, x)) for y, row in enumerate(self.grid) for x, num in enumerate(row)])
 
 ##############################################################
-
-
-
-
-
-
-
-
-
 

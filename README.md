@@ -1,5 +1,5 @@
 # Sudoku Solver
-This is a sudoku solver utilizing the backtracking algorithm. It includes a graphical GUI as well as a text based version.
+This is a sudoku solver utilizing the backtracking algorithm. It includes a GUI as well as a text based version.
 
 Run main.py to play sudoku! (Work in Progress)
 
@@ -21,3 +21,6 @@ can be found as docstrings for the respective functions.
     * findEmpty - finds an empty slot in the sudoku grid
     * isPossible - determines the validity of adding a number to a specific slot
     * solve - solves the board using backtracking
+    
+# For the Graphical User Interface (GUI.py) ...
+

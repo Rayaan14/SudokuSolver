@@ -3,7 +3,7 @@ from settings import *
 
 class Button:
     def __init__(self, x, y, width, height, text=None, color=(53, 72, 94),
-                 highlightedColor=(133, 146, 158), function=None, parameters=None):
+                 highlightedColor=(255, 235, 240), function=None, parameters=None):
         self.image = pygame.Surface((width, height))
         self.pos = (x, y)
         self.rect = self.image.get_rect()
@@ -36,12 +36,10 @@ class Button:
             self.function
 
     def drawText(self, text):
-        font = pygame.font.SysFont("arial", 20, bold=1)
+        font = pygame.font.SysFont(txtFont, 20, bold=1)
         text = font.render(text, False, BLACK)
         width, height = text.get_size()
         x = (self.width - width)//2
         y = (self.height - height)//2
         self.image.blit(text, (x, y))
-
-
 
