@@ -20,6 +20,9 @@ class App:
         self.finished = False
         self.cellChanged = False
         self.font = pygame.font.SysFont(numFont, cellSize // 2)
+        self.clock = pygame.time.Clock()
+        self.timer = 0
+        self.dt = 0
         self.playingButtons = []
         self.lockedCells = []
         self.incorrectCells = []
@@ -65,15 +68,19 @@ class App:
     def playingUpdate(self):
         self.mousePos = pygame.mouse.get_pos()
 
+        if not self.finished:
+            self.timer += self.dt
+
         for button in self.playingButtons:
             button.update(self.mousePos)
 
         if self.cellChanged:
             self.incorrectCells = []
             self.checkAllCells()
-            if self.allCellsDone():
-                if len(self.incorrectCells) == 0:
-                    self.finished = True
+
+        if self.allCellsDone():
+            if len(self.incorrectCells) == 0:
+                self.finished = True
 
     def playingDraw(self):
         self.window.fill(WHITE)
@@ -86,10 +93,10 @@ class App:
 
         self.shadeLockedCells(self.window, self.lockedCells)
         self.shadeIncorrectCells(self.window, self.incorrectCells)
-
-        self.drawNumbers(self.window)
-
+        self.drawNumbers(self.window) if not self.finished else self.drawNumbers(self.window, SOLVE)
         self.drawGrid(self.window)
+        self.drawTimer(self.window)
+
         pygame.display.update()
         self.cellChanged = False # Reset
 ##############################################################
@@ -118,6 +125,7 @@ class App:
                 pass
 
         self.grid = board
+        self.timer = 0
         self.load()
 
     def drawNumbers(self, window, color=BLACK):
@@ -187,6 +195,11 @@ class App:
         except:
             return False
 
+    def convert(self, s):
+        min, sec = divmod(s, 60)
+        hour, min = divmod(min, 60)
+        return "%d:%02d:%02d" % (hour, min, sec)
+
     def allCellsDone(self):
         for row in self.grid:
             for num in row:
@@ -198,5 +211,9 @@ class App:
         _ = [self.incorrectCells.append([x, y]) for y, row in enumerate(self.grid) for x, num in enumerate(row) if not isPossible(self.grid, num, (y, x)) if num != 0]
         return all([isPossible(self.grid, num, (y, x)) for y, row in enumerate(self.grid) for x, num in enumerate(row)])
 
+    def drawTimer(self, window):
+        txt = self.font.render(self.convert(round(self.timer, 2)), True, BLACK)
+        window.blit(txt, (75, 560))
+        self.dt = self.clock.tick(30) / 1000
 ##############################################################
 
