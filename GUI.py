@@ -1,6 +1,5 @@
 ##############################################################
 import sys
-import pygame
 import requests
 from solver import *
 from buttons import *
@@ -15,7 +14,7 @@ class App:
         pygame.init()
         self.window = pygame.display.set_mode((WIDTH, HEIGHT))
         self.running = True
-        self.selected = None
+        self.selected = [0, 0]
         self.mousePos = None
         self.finished = False
         self.cellChanged = False
@@ -65,6 +64,15 @@ class App:
                         self.grid[self.selected[1]][self.selected[0]] = int(event.unicode)
                         self.cellChanged = True
 
+                if event.key == pygame.K_LEFT and self.selected[0] > 0:
+                    self.selected[0] -= 1
+                if event.key == pygame.K_RIGHT and self.selected[0] < 8:
+                    self.selected[0] += 1
+                if event.key == pygame.K_UP and self.selected[1] > 0:
+                    self.selected[1] -= 1
+                if event.key == pygame.K_DOWN and self.selected[1] < 8:
+                    self.selected[1] += 1
+
     def playingUpdate(self):
         self.mousePos = pygame.mouse.get_pos()
 
@@ -88,10 +96,11 @@ class App:
         for button in self.playingButtons:
             button.draw(self.window)
 
+        self.shadeLockedCells(self.window, self.lockedCells)
+
         if self.selected:
             self.drawSelection(self.window, self.selected)
 
-        self.shadeLockedCells(self.window, self.lockedCells)
         self.shadeIncorrectCells(self.window, self.incorrectCells)
         self.drawNumbers(self.window) if not self.finished else self.drawNumbers(self.window, SOLVE)
         self.drawGrid(self.window)
@@ -126,6 +135,7 @@ class App:
 
         self.grid = board
         self.timer = 0
+        self.selected = [0, 0]
         self.load()
 
     def drawNumbers(self, window, color=BLACK):
@@ -136,7 +146,10 @@ class App:
                     self.textToScreen(window, str(num), pos, color)
 
     def drawSelection(self, window, pos):
-        pygame.draw.rect(window, LIGHTORANGE, ((pos[0] * cellSize) + gridPos[0], (pos[1] * cellSize) + gridPos[1], cellSize, cellSize))
+        if pos in self.lockedCells:
+            pygame.draw.rect(window, LOCKED, ((pos[0] * cellSize) + gridPos[0], (pos[1] * cellSize) + gridPos[1], cellSize, cellSize))
+        else:
+            pygame.draw.rect(window, ORANGE, ((pos[0] * cellSize) + gridPos[0], (pos[1] * cellSize) + gridPos[1], cellSize, cellSize))
 
     def drawGrid(self, window):
         pygame.draw.rect(window, BLACK, (gridPos[0], gridPos[1], WIDTH-150, HEIGHT-150), 2)
@@ -150,7 +163,7 @@ class App:
             return False
         if self.mousePos[0] > gridPos[0] + gridSize or self.mousePos[1] > gridPos[1] + gridSize:
             return False
-        return (self.mousePos[0] - gridPos[0]) // cellSize, (self.mousePos[1] - gridPos[1]) // cellSize
+        return [(self.mousePos[0] - gridPos[0]) // cellSize, (self.mousePos[1] - gridPos[1]) // cellSize]
 
     def loadButtons(self):
         self.playingButtons.append(Button(20, 40, WIDTH//7, 40, function=solve, color=SOLVE, parameters=self.grid, text="SOLVE"))
@@ -182,11 +195,11 @@ class App:
 
     def shadeLockedCells(self, window, locked):
         for cell in locked:
-            pygame.draw.rect(window, CORNSILK, (cell[0] * cellSize + gridPos[0], cell[1] * cellSize + gridPos[1], cellSize, cellSize))
+            pygame.draw.rect(window, SILK, (cell[0] * cellSize + gridPos[0], cell[1] * cellSize + gridPos[1], cellSize, cellSize))
 
     def shadeIncorrectCells(self, window, incorrect):
         for cell in incorrect:
-            pygame.draw.rect(window, LIGHTRED, (cell[0] * cellSize + gridPos[0], cell[1] * cellSize + gridPos[1], cellSize, cellSize))
+            pygame.draw.rect(window, RED, (cell[0] * cellSize + gridPos[0], cell[1] * cellSize + gridPos[1], cellSize, cellSize))
 
     def isInt(self, str):
         try:
@@ -212,8 +225,9 @@ class App:
         return all([isPossible(self.grid, num, (y, x)) for y, row in enumerate(self.grid) for x, num in enumerate(row)])
 
     def drawTimer(self, window):
-        txt = self.font.render(self.convert(round(self.timer, 2)), True, BLACK)
+        txt = self.font.render(self.convert(round(self.timer, 2)), True, BLACK if not self.finished else RED)
         window.blit(txt, (75, 560))
         self.dt = self.clock.tick(30) / 1000
+
 ##############################################################
 

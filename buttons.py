@@ -1,9 +1,9 @@
 import pygame
 from settings import *
 
+
 class Button:
-    def __init__(self, x, y, width, height, text=None, color=(53, 72, 94),
-                 highlightedColor=(255, 235, 240), function=None, parameters=None):
+    def __init__(self, x, y, width, height, text=None, color=(53, 72, 94), highlightedColor=(255, 235, 240), function=None, parameters=None):
         self.image = pygame.Surface((width, height))
         self.pos = (x, y)
         self.rect = self.image.get_rect()

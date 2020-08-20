@@ -5,20 +5,19 @@ HEIGHT = 600
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-LIGHTORANGE = (250, 171, 83)
-CORNSILK = (255, 248, 220)
-LIGHTRED = (230, 80, 80)
+ORANGE = (250, 171, 83)
+SILK = (255, 248, 220)
+RED = (230, 80, 80)
 SOLVE = (52, 179, 16)
 EASY = (205, 85, 235)
 MEDIUM = (85, 235, 235)
 HARD = (245, 240, 55)
 EXPERT = (225, 50, 25)
-
-
+LOCKED = (255, 150, 150)
 
 # Fonts
-numFont = 'lato'
-txtFont = 'arial'
+numFont = "lato"
+txtFont = "arial"
 
 # Boards
 testBoard1 = [[0 for x in range(9)] for x in range(9)]
