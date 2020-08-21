@@ -33,10 +33,10 @@ class Button:
         if self.parameters:
             self.function(self.parameters)
         else:
-            self.function
+            self.function()
 
     def drawText(self, text):
-        font = pygame.font.SysFont(txtFont, 20, bold=1)
+        font = pygame.font.SysFont(txtFont, 15 if self.pos == (450, 560) else 20, bold=1)
         text = font.render(text, False, BLACK)
         width, height = text.get_size()
         x = (self.width - width)//2

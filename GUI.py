@@ -18,13 +18,12 @@ class App:
         self.mousePos = None
         self.finished = False
         self.cellChanged = False
+        self.check = True
         self.font = pygame.font.SysFont(numFont, cellSize // 2)
         self.clock = pygame.time.Clock()
-        self.timer = 0
-        self.dt = 0
+        self.timer, self.dt = 0, 0
         self.playingButtons = []
-        self.lockedCells = []
-        self.incorrectCells = []
+        self.lockedCells, self.incorrectCells = [], []
         self.grid = []
         self.getPuzzle("1")
         self.load()
@@ -52,17 +51,16 @@ class App:
                 if selected:
                     self.selected = selected
                 else:
-                    self.selected = None
+                    self.selected = [0, 0]
                     for button in self.playingButtons:
                         if button.highlighted:
                             button.click()
 
             if event.type == pygame.KEYDOWN:
-                if self.selected is not None and list(self.selected) not in self.lockedCells:
-                    if self.isInt(event.unicode):
-                        # Cell changed
-                        self.grid[self.selected[1]][self.selected[0]] = int(event.unicode)
-                        self.cellChanged = True
+                if self.selected is not None and list(self.selected) not in self.lockedCells and self.isInt(event.unicode):
+                    # Cell changed
+                    self.grid[self.selected[1]][self.selected[0]] = int(event.unicode)
+                    self.cellChanged = True
 
                 if event.key == pygame.K_LEFT and self.selected[0] > 0:
                     self.selected[0] -= 1
@@ -82,9 +80,11 @@ class App:
         for button in self.playingButtons:
             button.update(self.mousePos)
 
-        if self.cellChanged:
+        if self.check:
             self.incorrectCells = []
             self.checkAllCells()
+        else:
+            self.incorrectCells = []
 
         if self.allCellsDone():
             if len(self.incorrectCells) == 0:
@@ -146,10 +146,7 @@ class App:
                     self.textToScreen(window, str(num), pos, color)
 
     def drawSelection(self, window, pos):
-        if pos in self.lockedCells:
-            pygame.draw.rect(window, LOCKED, ((pos[0] * cellSize) + gridPos[0], (pos[1] * cellSize) + gridPos[1], cellSize, cellSize))
-        else:
-            pygame.draw.rect(window, ORANGE, ((pos[0] * cellSize) + gridPos[0], (pos[1] * cellSize) + gridPos[1], cellSize, cellSize))
+        pygame.draw.rect(window, LOCKED if pos in self.lockedCells else ORANGE, ((pos[0] * cellSize) + gridPos[0], (pos[1] * cellSize) + gridPos[1], cellSize, cellSize))
 
     def drawGrid(self, window):
         pygame.draw.rect(window, BLACK, (gridPos[0], gridPos[1], WIDTH-150, HEIGHT-150), 2)
@@ -171,6 +168,8 @@ class App:
         self.playingButtons.append(Button(WIDTH//2-(WIDTH//7)//2, 40, WIDTH//7, 40, function=self.getPuzzle, color=MEDIUM, parameters="2", text="Medium"))
         self.playingButtons.append(Button(380, 40, WIDTH//7, 40, function=self.getPuzzle, color=HARD, parameters="3", text="Hard"))
         self.playingButtons.append(Button(500, 40, WIDTH // 7, 40, function=self.getPuzzle, color=EXPERT, parameters="4", text="Expert"))
+        self.playingButtons.append(Button(450, 560, WIDTH // 8, 30, function=self.toggleCheck, color=CHECK_ON, text="Check: On"))
+
 
     def textToScreen(self, window, text, pos, color=BLACK):
         font = self.font.render(text, False, color)
@@ -212,6 +211,16 @@ class App:
         min, sec = divmod(s, 60)
         hour, min = divmod(min, 60)
         return "%d:%02d:%02d" % (hour, min, sec)
+
+    def toggleCheck(self):
+        self.check = not self.check
+
+        if self.check:
+            self.playingButtons[5].text = "Check: On"
+            self.playingButtons[5].color = CHECK_ON
+        else:
+            self.playingButtons[5].text = "Check: Off"
+            self.playingButtons[5].color = CHECK_OFF
 
     def allCellsDone(self):
         for row in self.grid:
