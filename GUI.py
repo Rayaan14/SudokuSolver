@@ -163,12 +163,13 @@ class App:
         return [(self.mousePos[0] - gridPos[0]) // cellSize, (self.mousePos[1] - gridPos[1]) // cellSize]
 
     def loadButtons(self):
-        self.playingButtons.append(Button(20, 40, WIDTH//7, 40, function=solve, color=SOLVE, parameters=self.grid, text="SOLVE"))
+        self.playingButtons.append(Button(20, 40, WIDTH//7, 40, function=self.solveBoard, color=SOLVE, text="SOLVE"))
         self.playingButtons.append(Button(140, 40, WIDTH//7, 40, function=self.getPuzzle, color=EASY, parameters="1", text="Easy"))
         self.playingButtons.append(Button(WIDTH//2-(WIDTH//7)//2, 40, WIDTH//7, 40, function=self.getPuzzle, color=MEDIUM, parameters="2", text="Medium"))
         self.playingButtons.append(Button(380, 40, WIDTH//7, 40, function=self.getPuzzle, color=HARD, parameters="3", text="Hard"))
         self.playingButtons.append(Button(500, 40, WIDTH // 7, 40, function=self.getPuzzle, color=EXPERT, parameters="4", text="Expert"))
         self.playingButtons.append(Button(450, 560, WIDTH // 8, 30, function=self.toggleCheck, color=CHECK_ON, text="Check: On"))
+        self.playingButtons.append(Button(350, 560, WIDTH // 8, 30, function=self.clearBoard, color=CLEAR, text="Clear"))
 
 
     def textToScreen(self, window, text, pos, color=BLACK):
@@ -222,6 +223,12 @@ class App:
             self.playingButtons[5].text = "Check: Off"
             self.playingButtons[5].color = CHECK_OFF
 
+    def clearBoard(self):
+        for x in range(9):
+            for y in range(9):
+                if [x, y] not in self.lockedCells:
+                    self.grid[y][x] = 0
+
     def allCellsDone(self):
         for row in self.grid:
             for num in row:
@@ -237,6 +244,10 @@ class App:
         txt = self.font.render(self.convert(round(self.timer, 2)), True, BLACK if not self.finished else RED)
         window.blit(txt, (75, 560))
         self.dt = self.clock.tick(30) / 1000
+
+    def solveBoard(self):
+        self.clearBoard()
+        solve(self.grid)
 
 ##############################################################
 

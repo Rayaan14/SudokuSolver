@@ -16,6 +16,7 @@ EXPERT = (225, 50, 25)
 CHECK_ON = (218, 246, 166)
 CHECK_OFF = (250, 100, 100)
 LOCKED = (255, 150, 150)
+CLEAR = (0, 255, 220)
 
 # Fonts
 numFont = "lato"
