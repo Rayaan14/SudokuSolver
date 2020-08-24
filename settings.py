@@ -13,7 +13,7 @@ EASY = (205, 85, 235)
 MEDIUM = (85, 235, 235)
 HARD = (245, 240, 55)
 EXPERT = (225, 50, 25)
-CHECK_ON = (218, 246, 166)
+CHECK_ON = (103, 255, 57)
 CHECK_OFF = (250, 100, 100)
 LOCKED = (255, 150, 150)
 CLEAR = (0, 255, 220)
@@ -22,7 +22,7 @@ CLEAR = (0, 255, 220)
 numFont = "lato"
 txtFont = "arial"
 
-# Boards
+# Test boards
 testBoard1 = [[0 for x in range(9)] for x in range(9)]
 testBoard2 = [
     [7, 8, 0, 4, 0, 0, 1, 2, 0],

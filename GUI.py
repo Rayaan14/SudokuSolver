@@ -17,7 +17,6 @@ class App:
         self.selected = [0, 0]
         self.mousePos = None
         self.finished = False
-        self.cellChanged = False
         self.check = True
         self.font = pygame.font.SysFont(numFont, cellSize // 2)
         self.clock = pygame.time.Clock()
@@ -57,10 +56,8 @@ class App:
                             button.click()
 
             if event.type == pygame.KEYDOWN:
-                if self.selected is not None and list(self.selected) not in self.lockedCells and self.isInt(event.unicode):
-                    # Cell changed
+                if self.selected is not None and list(self.selected) not in self.lockedCells and self.isInt(event.unicode) and not self.finished:
                     self.grid[self.selected[1]][self.selected[0]] = int(event.unicode)
-                    self.cellChanged = True
 
                 if event.key == pygame.K_LEFT and self.selected[0] > 0:
                     self.selected[0] -= 1
@@ -70,6 +67,9 @@ class App:
                     self.selected[1] -= 1
                 if event.key == pygame.K_DOWN and self.selected[1] < 8:
                     self.selected[1] += 1
+
+                if event.key == pygame.K_BACKSPACE and self.selected not in self.lockedCells and not self.finished:
+                    self.grid[self.selected[1]][self.selected[0]] = 0
 
     def playingUpdate(self):
         self.mousePos = pygame.mouse.get_pos()
@@ -107,7 +107,6 @@ class App:
         self.drawTimer(self.window)
 
         pygame.display.update()
-        self.cellChanged = False # Reset
 ##############################################################
 
 ################## HELPER FUNCTIONS ##########################
@@ -121,6 +120,7 @@ class App:
                'f50', 'f51', 'f52', 'f53', 'f54', 'f55', 'f56', 'f57', 'f58', 'f60', 'f61', 'f62', 'f63', 'f64', 'f65',
                'f66', 'f67', 'f68', 'f70', 'f71', 'f72', 'f73', 'f74', 'f75', 'f76', 'f77', 'f78', 'f80', 'f81', 'f82',
                'f83', 'f84', 'f85', 'f86', 'f87', 'f88']
+
         data = []
         for cid in ids:
             data.append(soup.find('input', id=cid))
@@ -187,7 +187,6 @@ class App:
         self.incorrectCells = []
         self.finished = False
 
-        # Setting locked cells
         for y, row in enumerate(self.grid):
             for x, num in enumerate(row):
                 if num != 0:
@@ -224,10 +223,11 @@ class App:
             self.playingButtons[5].color = CHECK_OFF
 
     def clearBoard(self):
-        for x in range(9):
-            for y in range(9):
-                if [x, y] not in self.lockedCells:
-                    self.grid[y][x] = 0
+        if not self.finished:
+            for x in range(9):
+                for y in range(9):
+                    if [x, y] not in self.lockedCells:
+                        self.grid[y][x] = 0
 
     def allCellsDone(self):
         for row in self.grid:

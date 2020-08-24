@@ -1,8 +1,11 @@
+##############################################################
 import pygame
 from settings import *
+##############################################################
 
 
 class Button:
+##############################################################
     def __init__(self, x, y, width, height, text=None, color=(53, 72, 94), highlightedColor=(255, 235, 240), function=None, parameters=None):
         self.image = pygame.Surface((width, height))
         self.pos = (x, y)
@@ -16,6 +19,9 @@ class Button:
         self.highlighted = False
         self.width = width
         self.height = height
+##############################################################
+
+#################### HELPER FUNCTIONS ########################
 
     def update(self, mouse):
         if self.rect.collidepoint(mouse):
@@ -43,3 +49,4 @@ class Button:
         y = (self.height - height)//2
         self.image.blit(text, (x, y))
 
+##############################################################
